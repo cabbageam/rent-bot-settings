@@ -6,80 +6,82 @@
 <title>Настройки поиска</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  /* Цвета берём из темы Telegram — страница выглядит родной и в светлой, и в тёмной теме */
+  /* Фирменные цвета, как у аватарки и сайта: коралловый, тёмно-винный, красный флага */
   :root {
-    --bg: var(--tg-theme-secondary-bg-color, #f2f2f6);
-    --card: var(--tg-theme-section-bg-color, var(--tg-theme-bg-color, #ffffff));
-    --text: var(--tg-theme-text-color, #111111);
-    --hint: var(--tg-theme-hint-color, #8a8a8e);
-    --accent: var(--tg-theme-button-color, #2a78d6);
-    --accent-text: var(--tg-theme-button-text-color, #ffffff);
-    --line: color-mix(in srgb, var(--hint) 22%, transparent);
-    --soft: color-mix(in srgb, var(--accent) 12%, transparent);
+    --coral-1: #ffb59c; --coral-2: #f4675a; --wine: #3a0a14; --wine-2: #5c1a27; --red: #e8112d;
+    --bg: #fff6f1; --card: #ffffff; --text: #1d0a0f; --hint: #8a7175; --line: #f0dcd4;
+    --chip: #fff0e8; --on: #3a0a14; --on-text: #ffffff;
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-tg]) {
-      --bg: #101012; --card: #1c1c1f; --text: #f2f2f2; --hint: #8e8e93; --accent: #3987e5;
-    }
+  :root[data-theme="dark"] {
+    --bg: #160b0e; --card: #22141a; --text: #f8ecea; --hint: #b49a9c; --line: #3a252b;
+    --chip: #2b1820; --on: #f4675a; --on-text: #2a070e;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
     margin: 0; background: var(--bg); color: var(--text);
     font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans",
           "Noto Sans Georgian", "Noto Sans Devanagari", Tahoma, sans-serif;
-    padding: 12px 16px 96px;
+    padding: 10px 14px 96px;
   }
   [dir="rtl"] body { text-align: right; }
 
-  /* Сводка поиска — главный элемент страницы */
-  .summary {
-    background: var(--accent); color: var(--accent-text);
-    border-radius: 18px; padding: 16px 18px 18px; margin-bottom: 14px;
-  }
-  .summary small { display: block; opacity: .75; font-size: 12px; letter-spacing: .02em; }
-  .summary p { margin: 4px 0 0; font-size: 17px; font-weight: 600; line-height: 1.35; }
+  /* Шапка: аватарка и сводка поиска на коралловом фоне, как на сайте */
+  .hero { position: relative; overflow: hidden; border-radius: 22px; padding: 16px 18px 18px;
+          margin-bottom: 12px; color: #2a070e;
+          background: linear-gradient(135deg, var(--coral-1), var(--coral-2)); }
+  .hero::before { content: ""; position: absolute; inset: 0; opacity: .1; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60' width='60' height='60'%3E%3Cpath transform='translate(30 30) scale(0.18)' fill='%233a0a14' d='M -15 -46 L 15 -46 L 7 -7 L 46 -15 L 46 15 L 7 7 L 15 46 L -15 46 L -7 7 L -46 15 L -46 -15 L -7 -7 Z'/%3E%3C/svg%3E");
+    background-size: 60px 60px; }
+  .hero-top { position: relative; display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .hero-top img { width: 34px; height: 34px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(255,255,255,.6); }
+  .hero-top b { font-size: 16px; }
+  .hero small { position: relative; display: block; font-size: 12px; font-weight: 600; opacity: .75;
+                text-transform: uppercase; letter-spacing: .04em; }
+  .hero p { position: relative; margin: 4px 0 0; font-size: 18px; font-weight: 700; line-height: 1.3; }
 
-  section { background: var(--card); border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; }
-  h2 { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--hint); }
+  section { background: var(--card); border-radius: 18px; padding: 14px 16px; margin-bottom: 10px;
+            box-shadow: 0 1px 0 var(--line); }
+  h2 { margin: 0 0 10px; font-size: 12px; font-weight: 700; color: var(--hint);
+       text-transform: uppercase; letter-spacing: .05em; }
   .note { font-size: 12.5px; color: var(--hint); margin: 8px 0 0; }
 
   /* Сегменты: город, комнаты, язык */
-  .seg { display: flex; gap: 4px; background: var(--bg); border-radius: 12px; padding: 4px; }
+  .seg { display: flex; gap: 4px; background: var(--chip); border-radius: 14px; padding: 4px; }
   .seg button {
-    flex: 1; border: 0; background: transparent; color: var(--text); border-radius: 9px;
-    padding: 9px 4px; font: inherit; font-size: 14px; cursor: pointer; min-height: 40px;
+    flex: 1; border: 0; background: transparent; color: var(--text); border-radius: 10px;
+    padding: 9px 4px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; min-height: 40px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 0;
   }
-  .seg button[aria-pressed="true"] {
-    background: var(--card); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.12);
-  }
+  .seg button[aria-pressed="true"] { background: var(--on); color: var(--on-text); }
+  .seg .flag { width: 24px; height: 16px; border-radius: 3px; box-shadow: 0 0 0 1px rgba(0,0,0,.12); flex: none; }
 
   /* Районы по частям города */
-  .group + .group { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; }
+  .group + .group { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 12px; }
   .group-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  .group-head b { font-size: 14px; }
-  .link { border: 0; background: none; color: var(--accent); font: inherit; font-size: 13px;
+  .group-head b { font-size: 14.5px; }
+  .link { border: 0; background: none; color: var(--coral-2); font: inherit; font-size: 13px; font-weight: 700;
           padding: 6px 0; cursor: pointer; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
   .chip {
-    border: 1px solid var(--line); background: transparent; color: var(--text);
-    border-radius: 999px; padding: 7px 12px; font: inherit; font-size: 14px; cursor: pointer;
+    border: 0; background: var(--chip); color: var(--text);
+    border-radius: 999px; padding: 8px 13px; font: inherit; font-size: 14px; cursor: pointer;
   }
-  .chip[aria-pressed="true"] { background: var(--soft); border-color: var(--accent); color: var(--accent); }
-  .chip[aria-pressed="true"]::before { content: "✓ "; }
+  .chip[aria-pressed="true"] { background: var(--on); color: var(--on-text); font-weight: 600; }
 
   /* Бюджет */
   .budget { display: flex; align-items: center; gap: 10px; }
-  .budget label { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 6px; background: var(--bg);
-                  border-radius: 12px; padding: 0 12px; min-height: 44px; }
+  .budget label { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 6px; background: var(--chip);
+                  border-radius: 14px; padding: 0 12px; min-height: 46px; }
   .budget span { color: var(--hint); font-size: 13px; }
   .budget input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--text);
-                  font: inherit; font-size: 16px; outline: none; padding: 10px 0; }
+                  font: inherit; font-size: 17px; font-weight: 700; outline: none; padding: 10px 0; }
   .presets { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
 
   /* Переключатели */
   .row { display: flex; align-items: center; justify-content: space-between; gap: 12px;
-         padding: 6px 0; min-height: 44px; }
+         padding: 6px 0; min-height: 46px; }
   .row + .row { border-top: 1px solid var(--line); }
+  .row div span { font-weight: 600; }
   .row div small { display: block; color: var(--hint); font-size: 12.5px; }
   .switch { position: relative; width: 50px; height: 30px; flex: none; }
   .switch input { opacity: 0; width: 100%; height: 100%; margin: 0; position: absolute; cursor: pointer; }
@@ -88,19 +90,20 @@
   .switch i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px;
                      border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25);
                      transition: transform .15s; }
-  .switch input:checked + i { background: var(--accent); }
+  .switch input:checked + i { background: linear-gradient(135deg, var(--coral-1), var(--coral-2)); }
   .switch input:checked + i::after { transform: translateX(20px); }
-  [dir="rtl"] .switch input:checked + i::after { transform: translateX(20px); }
 
   /* Кнопка сохранения — только при просмотре вне Telegram (в Telegram — родная нижняя кнопка) */
-  #fallbackSave { display: none; position: fixed; left: 16px; right: 16px; bottom: 16px;
-                  border: 0; border-radius: 14px; padding: 15px; font: inherit; font-weight: 600;
-                  background: var(--accent); color: var(--accent-text); cursor: pointer; }
-  button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #fallbackSave { display: none; position: fixed; left: 14px; right: 14px; bottom: 14px;
+                  border: 0; border-radius: 16px; padding: 15px; font: inherit; font-weight: 700;
+                  background: var(--wine); color: #fff; cursor: pointer; }
+  :root[data-theme="dark"] #fallbackSave { background: var(--coral-2); color: #2a070e; }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--coral-2); outline-offset: 2px; }
 </style>
 </head>
 <body>
-  <div class="summary" aria-live="polite">
+  <div class="hero" aria-live="polite">
+    <div class="hero-top"><img src="https://cabbageam.github.io/georgia-helper/avatar.png" alt=""><b id="pageTitle"></b></div>
     <small id="summaryLabel"></small>
     <p id="summary"></p>
   </div>
@@ -151,6 +154,13 @@
 <script>
 // ---------- справочники (ключи совпадают с app/listings.py) ----------
 const LANGS = { ru: "RU", en: "EN", ka: "KA", hi: "HI", fa: "FA" };
+const FLAGS = {
+  ru: '<svg class="flag" viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect y="6.67" width="30" height="6.67" fill="#0039a6"/><rect y="13.33" width="30" height="6.67" fill="#d52b1e"/></svg>',
+  en: '<svg class="flag" viewBox="0 0 60 40"><clipPath id="ukc"><rect width="60" height="40"/></clipPath><g clip-path="url(#ukc)"><rect width="60" height="40" fill="#012169"/><path d="M0 0 60 40M60 0 0 40" stroke="#fff" stroke-width="8"/><path d="M0 0 60 40M60 0 0 40" stroke="#c8102e" stroke-width="3"/><path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="12"/><path d="M30 0v40M0 20h60" stroke="#c8102e" stroke-width="7"/></g></svg>',
+  ka: '<svg class="flag" viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect x="13" width="4" height="20" fill="#e8112d"/><rect y="8" width="30" height="4" fill="#e8112d"/><g fill="#e8112d"><path d="M6 2.2h1v1.8h1.8v1H7v1.8H6V5H4.2V4H6z"/><path d="M23 2.2h1v1.8h1.8v1H24v1.8h-1V5h-1.8V4H23z"/><path d="M6 13.2h1v1.8h1.8v1H7v1.8H6V16H4.2v-1H6z"/><path d="M23 13.2h1v1.8h1.8v1H24v1.8h-1V16h-1.8v-1H23z"/></g></svg>',
+  hi: '<svg class="flag" viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="6.67" fill="#ff9933"/><rect y="13.33" width="30" height="6.67" fill="#138808"/><circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" stroke-width=".8"/></svg>',
+  fa: '<svg class="flag" viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/><rect width="30" height="6.67" fill="#239f40"/><rect y="13.33" width="30" height="6.67" fill="#da0000"/><circle cx="15" cy="10" r="2" fill="none" stroke="#da0000" stroke-width=".9"/></svg>',
+};
 const CITIES = {
   tbilisi: { ru: "Тбилиси", en: "Tbilisi", ka: "თბილისი" },
   batumi:  { ru: "Батуми",  en: "Batumi",  ka: "ბათუმი" },
@@ -217,7 +227,7 @@ const T = {
     owner: "सिर्फ़ मालिक", ownerSub: "एजेंट और एजेंट जैसे विक्रेता नहीं",
     pets: "पालतू जानवर की अनुमति", notify: "नए फ़्लैट भेजें", notifySub: "रोकने के लिए बंद करें",
     lang: "बॉट की भाषा", save: "सेव करें", multi: "यहाँ आपका मुख्य फ़िल्टर बदलता है। बाकी फ़िल्टर चैट में, “मेरे फ़िल्टर” बटन।",
-    groups: { center: "Center", west: "Vake & Saburtalo", north: "North", east: "East" },
+    groups: { center: "केंद्र", west: "वाके और साबुर्तालो", north: "उत्तर", east: "पूर्व" },
     s: { any: "कोई भी फ़्लैट", rooms: n => `${n} कमरे`, in: "—", anyDistrict: "पूरा शहर",
          upTo: "तक", from: "से", owner: "सिर्फ़ मालिक", pets: "पालतू की अनुमति", paused: "सूचनाएँ रुकी हैं" } },
   fa: { title: "تنظیمات جستجو", summaryLabel: "شما دنبال این هستید", city: "شهر", districts: "محله‌ها",
@@ -227,7 +237,7 @@ const T = {
     owner: "فقط مالکان", ownerSub: "بدون بنگاه و موارد شبیه بنگاه",
     pets: "حیوان خانگی مجاز", notify: "ارسال آپارتمان‌های جدید", notifySub: "برای توقف خاموش کنید",
     lang: "زبان ربات", save: "ذخیره", multi: "اینجا فیلتر اصلی شما تغییر می‌کند. بقیهٔ فیلترها در چت، دکمهٔ «فیلترهای من».",
-    groups: { center: "Center", west: "Vake & Saburtalo", north: "North", east: "East" },
+    groups: { center: "مرکز", west: "واکه و سابورتالو", north: "شمال", east: "شرق" },
     s: { any: "هر آپارتمانی", rooms: n => `${n} اتاق`, in: "—", anyDistrict: "کل شهر",
          upTo: "تا", from: "از", owner: "فقط مالکان", pets: "حیوان مجاز", paused: "اعلان‌ها متوقف است" } },
 };
@@ -247,7 +257,12 @@ const state = {
 const multi = q.get("multi") === "1";
 
 const tg = window.Telegram && Telegram.WebApp && Telegram.WebApp.initData ? Telegram.WebApp : null;
-if (tg) { document.documentElement.dataset.tg = "1"; tg.ready(); tg.expand(); }
+const darkTheme = tg ? tg.colorScheme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+document.documentElement.dataset.theme = darkTheme ? "dark" : "light";
+if (tg) {
+  tg.ready(); tg.expand();
+  try { tg.setHeaderColor(darkTheme ? "#160b0e" : "#fff6f1"); tg.setBackgroundColor(darkTheme ? "#160b0e" : "#fff6f1"); } catch (e) {}
+}
 
 const $ = id => document.getElementById(id);
 const L = () => T[state.lang];
@@ -259,7 +274,8 @@ function segButtons(el, items, isOn, onClick) {
   el.innerHTML = "";
   for (const [value, label] of items) {
     const b = document.createElement("button");
-    b.type = "button"; b.textContent = label;
+    b.type = "button";
+    if (label.startsWith("<")) b.innerHTML = label; else b.textContent = label;
     b.setAttribute("aria-pressed", isOn(value) ? "true" : "false");
     b.onclick = () => { onClick(value); haptic(); render(); };
     el.appendChild(b);
@@ -297,13 +313,14 @@ function render() {
     ["lOwner", "owner"], ["sOwner", "ownerSub"], ["lPets", "pets"], ["lNotify", "notify"],
     ["sNotify", "notifySub"], ["hLang", "lang"], ["fallbackSave", "save"]]) $(id).textContent = t[key];
   $("multiNote").textContent = multi ? t.multi : "";
+  $("pageTitle").textContent = t.title;
   $("summary").textContent = summaryText();
 
   segButtons($("city"), Object.keys(CITIES).map(k => [k, cName(k)]), v => v === state.city, v => {
     state.city = v; if (v !== "tbilisi") state.districts = [];
   });
   segButtons($("rooms"), [[1, "1"], [2, "2"], [3, "3"], [4, "4+"]], v => state.rooms.includes(v), v => toggle(state.rooms, v));
-  segButtons($("lang"), Object.entries(LANGS), v => v === state.lang, v => { state.lang = v; });
+  segButtons($("lang"), Object.keys(LANGS).map(k => [k, FLAGS[k]]), v => v === state.lang, v => { state.lang = v; });
 
   const box = $("districts");
   box.innerHTML = "";
@@ -346,7 +363,10 @@ function render() {
   }
   $("owner").checked = state.owner; $("pets").checked = state.pets; $("notify").checked = state.notify;
 
-  if (tg) { tg.MainButton.setText(t.save); tg.MainButton.show(); }
+  if (tg) {
+    tg.MainButton.setParams({ text: t.save, color: darkTheme ? "#f4675a" : "#3a0a14",
+                              text_color: darkTheme ? "#2a070e" : "#ffffff", is_visible: true });
+  }
   else $("fallbackSave").style.display = "block";
 }
 
