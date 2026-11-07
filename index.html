@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Настройки поиска</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  /* Цвета берём из темы Telegram — страница выглядит родной и в светлой, и в тёмной теме */
+  :root {
+    --bg: var(--tg-theme-secondary-bg-color, #f2f2f6);
+    --card: var(--tg-theme-section-bg-color, var(--tg-theme-bg-color, #ffffff));
+    --text: var(--tg-theme-text-color, #111111);
+    --hint: var(--tg-theme-hint-color, #8a8a8e);
+    --accent: var(--tg-theme-button-color, #2a78d6);
+    --accent-text: var(--tg-theme-button-text-color, #ffffff);
+    --line: color-mix(in srgb, var(--hint) 22%, transparent);
+    --soft: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tg]) {
+      --bg: #101012; --card: #1c1c1f; --text: #f2f2f2; --hint: #8e8e93; --accent: #3987e5;
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans",
+          "Noto Sans Georgian", "Noto Sans Devanagari", Tahoma, sans-serif;
+    padding: 12px 16px 96px;
+  }
+  [dir="rtl"] body { text-align: right; }
+
+  /* Сводка поиска — главный элемент страницы */
+  .summary {
+    background: var(--accent); color: var(--accent-text);
+    border-radius: 18px; padding: 16px 18px 18px; margin-bottom: 14px;
+  }
+  .summary small { display: block; opacity: .75; font-size: 12px; letter-spacing: .02em; }
+  .summary p { margin: 4px 0 0; font-size: 17px; font-weight: 600; line-height: 1.35; }
+
+  section { background: var(--card); border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; }
+  h2 { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--hint); }
+  .note { font-size: 12.5px; color: var(--hint); margin: 8px 0 0; }
+
+  /* Сегменты: город, комнаты, язык */
+  .seg { display: flex; gap: 4px; background: var(--bg); border-radius: 12px; padding: 4px; }
+  .seg button {
+    flex: 1; border: 0; background: transparent; color: var(--text); border-radius: 9px;
+    padding: 9px 4px; font: inherit; font-size: 14px; cursor: pointer; min-height: 40px;
+  }
+  .seg button[aria-pressed="true"] {
+    background: var(--card); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.12);
+  }
+
+  /* Районы по частям города */
+  .group + .group { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; }
+  .group-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .group-head b { font-size: 14px; }
+  .link { border: 0; background: none; color: var(--accent); font: inherit; font-size: 13px;
+          padding: 6px 0; cursor: pointer; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip {
+    border: 1px solid var(--line); background: transparent; color: var(--text);
+    border-radius: 999px; padding: 7px 12px; font: inherit; font-size: 14px; cursor: pointer;
+  }
+  .chip[aria-pressed="true"] { background: var(--soft); border-color: var(--accent); color: var(--accent); }
+  .chip[aria-pressed="true"]::before { content: "✓ "; }
+
+  /* Бюджет */
+  .budget { display: flex; align-items: center; gap: 10px; }
+  .budget label { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 6px; background: var(--bg);
+                  border-radius: 12px; padding: 0 12px; min-height: 44px; }
+  .budget span { color: var(--hint); font-size: 13px; }
+  .budget input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--text);
+                  font: inherit; font-size: 16px; outline: none; padding: 10px 0; }
+  .presets { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+
+  /* Переключатели */
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+         padding: 6px 0; min-height: 44px; }
+  .row + .row { border-top: 1px solid var(--line); }
+  .row div small { display: block; color: var(--hint); font-size: 12.5px; }
+  .switch { position: relative; width: 50px; height: 30px; flex: none; }
+  .switch input { opacity: 0; width: 100%; height: 100%; margin: 0; position: absolute; cursor: pointer; }
+  .switch i { position: absolute; inset: 0; border-radius: 99px; background: var(--line);
+              transition: background .15s; pointer-events: none; }
+  .switch i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px;
+                     border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25);
+                     transition: transform .15s; }
+  .switch input:checked + i { background: var(--accent); }
+  .switch input:checked + i::after { transform: translateX(20px); }
+  [dir="rtl"] .switch input:checked + i::after { transform: translateX(20px); }
+
+  /* Кнопка сохранения — только при просмотре вне Telegram (в Telegram — родная нижняя кнопка) */
+  #fallbackSave { display: none; position: fixed; left: 16px; right: 16px; bottom: 16px;
+                  border: 0; border-radius: 14px; padding: 15px; font: inherit; font-weight: 600;
+                  background: var(--accent); color: var(--accent-text); cursor: pointer; }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+  <div class="summary" aria-live="polite">
+    <small id="summaryLabel"></small>
+    <p id="summary"></p>
+  </div>
+
+  <section>
+    <h2 id="hCity"></h2>
+    <div class="seg" id="city" role="group"></div>
+  </section>
+
+  <section id="districtsBox">
+    <h2 id="hDistricts"></h2>
+    <div id="districts"></div>
+    <p class="note" id="districtsNote"></p>
+  </section>
+
+  <section>
+    <h2 id="hBudget"></h2>
+    <div class="budget">
+      <label><span id="lFrom"></span><input id="min" inputmode="numeric" placeholder="0"></label>
+      <label><span id="lTo"></span><input id="max" inputmode="numeric" placeholder="∞"></label>
+    </div>
+    <div class="presets" id="presets"></div>
+  </section>
+
+  <section>
+    <h2 id="hRooms"></h2>
+    <div class="seg" id="rooms" role="group"></div>
+    <p class="note" id="roomsNote"></p>
+  </section>
+
+  <section>
+    <div class="row"><div><span id="lOwner"></span><small id="sOwner"></small></div>
+      <span class="switch"><input type="checkbox" id="owner"><i></i></span></div>
+    <div class="row"><div><span id="lPets"></span></div>
+      <span class="switch"><input type="checkbox" id="pets"><i></i></span></div>
+    <div class="row"><div><span id="lNotify"></span><small id="sNotify"></small></div>
+      <span class="switch"><input type="checkbox" id="notify"><i></i></span></div>
+  </section>
+
+  <section>
+    <h2 id="hLang"></h2>
+    <div class="seg" id="lang" role="group"></div>
+  </section>
+
+  <p class="note" id="multiNote" style="padding: 0 4px"></p>
+  <button id="fallbackSave"></button>
+
+<script>
+// ---------- справочники (ключи совпадают с app/listings.py) ----------
+const LANGS = { ru: "RU", en: "EN", ka: "KA", hi: "HI", fa: "FA" };
+const CITIES = {
+  tbilisi: { ru: "Тбилиси", en: "Tbilisi", ka: "თბილისი" },
+  batumi:  { ru: "Батуми",  en: "Batumi",  ka: "ბათუმი" },
+  kutaisi: { ru: "Кутаиси", en: "Kutaisi", ka: "ქუთაისი" },
+  rustavi: { ru: "Рустави", en: "Rustavi", ka: "რუსთავი" },
+};
+const D = {
+  mtatsminda: ["Мтацминда", "Mtatsminda", "მთაწმინდა"], sololaki: ["Сололаки", "Sololaki", "სოლოლაკი"],
+  vera: ["Вера", "Vera", "ვერა"], avlabari: ["Авлабари", "Avlabari", "ავლაბარი"],
+  chugureti: ["Чугурети", "Chugureti", "ჩუღურეთი"], ortachala: ["Ортачала", "Ortachala", "ორთაჭალა"],
+  krtsanisi: ["Крцаниси", "Krtsanisi", "კრწანისი"],
+  vake: ["Ваке", "Vake", "ვაკე"], saburtalo: ["Сабуртало", "Saburtalo", "საბურთალო"],
+  nutsubidze: ["Плато Нуцубидзе", "Nutsubidze Plateau", "ნუცუბიძის პლატო"],
+  lisi: ["Лиси", "Lisi Lake", "ლისი"], bagebi: ["Багеби", "Bagebi", "ბაგები"],
+  didube: ["Дидубе", "Didube", "დიდუბე"], digomi: ["Дигоми", "Digomi", "დიღომი"],
+  didi_dighomi: ["Диди Дигоми", "Didi Dighomi", "დიდი დიღომი"],
+  nadzaladevi: ["Надзаладеви", "Nadzaladevi", "ნაძალადევი"], gldani: ["Глдани", "Gldani", "გლდანი"],
+  isani: ["Исани", "Isani", "ისანი"], samgori: ["Самгори", "Samgori", "სამგორი"],
+  varketili: ["Варкетили", "Varketili", "ვარკეთილი"], vazisubani: ["Вазисубани", "Vazisubani", "ვაზისუბანი"],
+};
+const GROUPS = [
+  ["center", ["mtatsminda", "sololaki", "vera", "avlabari", "chugureti", "ortachala", "krtsanisi"]],
+  ["west",   ["vake", "saburtalo", "nutsubidze", "lisi", "bagebi"]],
+  ["north",  ["didube", "digomi", "didi_dighomi", "nadzaladevi", "gldani"]],
+  ["east",   ["isani", "samgori", "varketili", "vazisubani"]],
+];
+
+// ---------- тексты страницы ----------
+const T = {
+  ru: { title: "Настройки поиска", summaryLabel: "Вы ищете", city: "Город", districts: "Районы",
+    districtsNote: "Ничего не выбрано — ищем по всему городу.", districtsOther: "Для этого города ищем по всем районам.",
+    all: "Выбрать все", none: "Снять все", budget: "Бюджет в месяц, $", from: "от", to: "до",
+    rooms: "Комнаты", roomsNote: "Можно выбрать несколько. Ничего не выбрано — любое число.",
+    owner: "Только собственники", ownerSub: "Без агентов и похожих на агентов",
+    pets: "Можно с животными", notify: "Присылать новые квартиры", notifySub: "Выключите, чтобы взять паузу",
+    lang: "Язык бота", save: "Сохранить", multi: "Здесь меняется ваш основной фильтр. Остальные фильтры — в чате, кнопка «Мои фильтры».",
+    groups: { center: "Центр", west: "Ваке и Сабуртало", north: "Север", east: "Восток" },
+    s: { any: "Любая квартира", rooms: n => `${n} комн.`, in: "в", anyDistrict: "весь город",
+         upTo: "до", from: "от", owner: "только собственники", pets: "можно с животными", paused: "уведомления на паузе" } },
+  en: { title: "Search settings", summaryLabel: "You're looking for", city: "City", districts: "Districts",
+    districtsNote: "Nothing selected — searching the whole city.", districtsOther: "For this city we search all districts.",
+    all: "Select all", none: "Clear", budget: "Monthly budget, $", from: "from", to: "to",
+    rooms: "Rooms", roomsNote: "Pick several if you like. None selected — any number.",
+    owner: "Owners only", ownerSub: "No agents or agent-like sellers",
+    pets: "Pets allowed", notify: "Send new apartments", notifySub: "Turn off to take a break",
+    lang: "Bot language", save: "Save", multi: "This edits your main filter. Other filters are in the chat, “My filters” button.",
+    groups: { center: "Center", west: "Vake & Saburtalo", north: "North", east: "East" },
+    s: { any: "Any apartment", rooms: n => `${n} rooms`, in: "in", anyDistrict: "the whole city",
+         upTo: "up to", from: "from", owner: "owners only", pets: "pets allowed", paused: "alerts paused" } },
+  ka: { title: "ძიების პარამეტრები", summaryLabel: "თქვენ ეძებთ", city: "ქალაქი", districts: "უბნები",
+    districtsNote: "არაფერია არჩეული — ვეძებთ მთელ ქალაქში.", districtsOther: "ამ ქალაქში ვეძებთ ყველა უბანში.",
+    all: "ყველა", none: "გასუფთავება", budget: "ბიუჯეტი თვეში, $", from: "დან", to: "მდე",
+    rooms: "ოთახები", roomsNote: "შეიძლება რამდენიმე. არაფერია არჩეული — ნებისმიერი.",
+    owner: "მხოლოდ მესაკუთრეები", ownerSub: "აგენტებისა და აგენტის მსგავსების გარეშე",
+    pets: "ცხოველით შეიძლება", notify: "ახალი ბინების გამოგზავნა", notifySub: "გამორთეთ პაუზისთვის",
+    lang: "ბოტის ენა", save: "შენახვა", multi: "აქ იცვლება მთავარი ფილტრი. სხვა ფილტრები — ჩატში, ღილაკი „ჩემი ფილტრები“.",
+    groups: { center: "ცენტრი", west: "ვაკე და საბურთალო", north: "ჩრდილოეთი", east: "აღმოსავლეთი" },
+    s: { any: "ნებისმიერი ბინა", rooms: n => `${n} ოთახი`, in: "—", anyDistrict: "მთელი ქალაქი",
+         upTo: "მდე", from: "დან", owner: "მხოლოდ მესაკუთრეები", pets: "ცხოველით", paused: "შეტყობინებები პაუზაზეა" } },
+  hi: { title: "खोज सेटिंग्स", summaryLabel: "आप ढूँढ रहे हैं", city: "शहर", districts: "इलाके",
+    districtsNote: "कुछ नहीं चुना — पूरे शहर में खोज।", districtsOther: "इस शहर में सभी इलाकों में खोज।",
+    all: "सब चुनें", none: "हटाएँ", budget: "मासिक बजट, $", from: "से", to: "तक",
+    rooms: "कमरे", roomsNote: "एक से ज़्यादा चुन सकते हैं। कुछ नहीं चुना — कोई भी।",
+    owner: "सिर्फ़ मालिक", ownerSub: "एजेंट और एजेंट जैसे विक्रेता नहीं",
+    pets: "पालतू जानवर की अनुमति", notify: "नए फ़्लैट भेजें", notifySub: "रोकने के लिए बंद करें",
+    lang: "बॉट की भाषा", save: "सेव करें", multi: "यहाँ आपका मुख्य फ़िल्टर बदलता है। बाकी फ़िल्टर चैट में, “मेरे फ़िल्टर” बटन।",
+    groups: { center: "Center", west: "Vake & Saburtalo", north: "North", east: "East" },
+    s: { any: "कोई भी फ़्लैट", rooms: n => `${n} कमरे`, in: "—", anyDistrict: "पूरा शहर",
+         upTo: "तक", from: "से", owner: "सिर्फ़ मालिक", pets: "पालतू की अनुमति", paused: "सूचनाएँ रुकी हैं" } },
+  fa: { title: "تنظیمات جستجو", summaryLabel: "شما دنبال این هستید", city: "شهر", districts: "محله‌ها",
+    districtsNote: "چیزی انتخاب نشده — جستجو در کل شهر.", districtsOther: "در این شهر همهٔ محله‌ها جستجو می‌شود.",
+    all: "انتخاب همه", none: "پاک کردن", budget: "بودجهٔ ماهانه، $", from: "از", to: "تا",
+    rooms: "اتاق", roomsNote: "می‌توانید چند مورد انتخاب کنید. بدون انتخاب — فرقی نمی‌کند.",
+    owner: "فقط مالکان", ownerSub: "بدون بنگاه و موارد شبیه بنگاه",
+    pets: "حیوان خانگی مجاز", notify: "ارسال آپارتمان‌های جدید", notifySub: "برای توقف خاموش کنید",
+    lang: "زبان ربات", save: "ذخیره", multi: "اینجا فیلتر اصلی شما تغییر می‌کند. بقیهٔ فیلترها در چت، دکمهٔ «فیلترهای من».",
+    groups: { center: "Center", west: "Vake & Saburtalo", north: "North", east: "East" },
+    s: { any: "هر آپارتمانی", rooms: n => `${n} اتاق`, in: "—", anyDistrict: "کل شهر",
+         upTo: "تا", from: "از", owner: "فقط مالکان", pets: "حیوان مجاز", paused: "اعلان‌ها متوقف است" } },
+};
+
+// ---------- состояние: приходит от бота в адресе страницы ----------
+const q = new URLSearchParams(location.search);
+const list = v => (v || "").split(",").filter(Boolean);
+const num = v => (v && /^\d+$/.test(v) ? Number(v) : null);
+const state = {
+  lang: LANGS[q.get("lang")] ? q.get("lang") : "ru",
+  city: CITIES[q.get("city")] ? q.get("city") : "tbilisi",
+  districts: list(q.get("d")).filter(k => D[k]),
+  min: num(q.get("min")), max: num(q.get("max")),
+  rooms: list(q.get("r")).map(Number).filter(n => n >= 1 && n <= 4),
+  owner: q.get("o") === "1", pets: q.get("p") === "1", notify: q.get("n") !== "0",
+};
+const multi = q.get("multi") === "1";
+
+const tg = window.Telegram && Telegram.WebApp && Telegram.WebApp.initData ? Telegram.WebApp : null;
+if (tg) { document.documentElement.dataset.tg = "1"; tg.ready(); tg.expand(); }
+
+const $ = id => document.getElementById(id);
+const L = () => T[state.lang];
+const placeIdx = () => (state.lang === "ru" ? 0 : state.lang === "ka" ? 2 : 1);
+const dName = k => D[k][placeIdx()];
+const cName = k => CITIES[k][state.lang] || CITIES[k].en;
+
+function segButtons(el, items, isOn, onClick) {
+  el.innerHTML = "";
+  for (const [value, label] of items) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = label;
+    b.setAttribute("aria-pressed", isOn(value) ? "true" : "false");
+    b.onclick = () => { onClick(value); haptic(); render(); };
+    el.appendChild(b);
+  }
+}
+function haptic() { if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged(); }
+function toggle(arr, v) { const i = arr.indexOf(v); i >= 0 ? arr.splice(i, 1) : arr.push(v); }
+
+function summaryText() {
+  const s = L().s, parts = [];
+  const rooms = [...state.rooms].sort();
+  const roomsTxt = rooms.length ? s.rooms(rooms.map(r => (r === 4 ? "4+" : r)).join(", ")) : s.any;
+  let where = cName(state.city);
+  if (state.city === "tbilisi" && state.districts.length) {
+    const names = state.districts.map(dName);
+    where = names.length > 3 ? `${names.slice(0, 3).join(", ")} +${names.length - 3}` : names.join(", ");
+  }
+  parts.push(`${roomsTxt} ${s.in} ${where}`.replace(" — ", " · "));
+  if (state.min && state.max) parts.push(`$${state.min}–${state.max}`);
+  else if (state.max) parts.push(state.lang === "ka" || state.lang === "hi" ? `$${state.max} ${s.upTo}` : `${s.upTo} $${state.max}`);
+  else if (state.min) parts.push(state.lang === "ka" || state.lang === "hi" ? `$${state.min} ${s.from}` : `${s.from} $${state.min}`);
+  if (state.owner) parts.push(s.owner);
+  if (state.pets) parts.push(s.pets);
+  if (!state.notify) parts.push("⏸ " + s.paused);
+  return parts.join(" · ");
+}
+
+function render() {
+  const t = L();
+  document.documentElement.lang = state.lang;
+  document.documentElement.dir = state.lang === "fa" ? "rtl" : "ltr";
+  document.title = t.title;
+  for (const [id, key] of [["summaryLabel", "summaryLabel"], ["hCity", "city"], ["hDistricts", "districts"],
+    ["hBudget", "budget"], ["lFrom", "from"], ["lTo", "to"], ["hRooms", "rooms"], ["roomsNote", "roomsNote"],
+    ["lOwner", "owner"], ["sOwner", "ownerSub"], ["lPets", "pets"], ["lNotify", "notify"],
+    ["sNotify", "notifySub"], ["hLang", "lang"], ["fallbackSave", "save"]]) $(id).textContent = t[key];
+  $("multiNote").textContent = multi ? t.multi : "";
+  $("summary").textContent = summaryText();
+
+  segButtons($("city"), Object.keys(CITIES).map(k => [k, cName(k)]), v => v === state.city, v => {
+    state.city = v; if (v !== "tbilisi") state.districts = [];
+  });
+  segButtons($("rooms"), [[1, "1"], [2, "2"], [3, "3"], [4, "4+"]], v => state.rooms.includes(v), v => toggle(state.rooms, v));
+  segButtons($("lang"), Object.entries(LANGS), v => v === state.lang, v => { state.lang = v; });
+
+  const box = $("districts");
+  box.innerHTML = "";
+  if (state.city === "tbilisi") {
+    for (const [gk, keys] of GROUPS) {
+      const g = document.createElement("div"); g.className = "group";
+      const allOn = keys.every(k => state.districts.includes(k));
+      const head = document.createElement("div"); head.className = "group-head";
+      const title = document.createElement("b"); title.textContent = t.groups[gk];
+      const link = document.createElement("button"); link.type = "button"; link.className = "link";
+      link.textContent = allOn ? t.none : t.all;
+      link.onclick = () => {
+        state.districts = allOn ? state.districts.filter(k => !keys.includes(k))
+                                : [...new Set([...state.districts, ...keys])];
+        haptic(); render();
+      };
+      head.append(title, link);
+      const chips = document.createElement("div"); chips.className = "chips";
+      for (const k of keys) {
+        const c = document.createElement("button"); c.type = "button"; c.className = "chip";
+        c.textContent = dName(k);
+        c.setAttribute("aria-pressed", state.districts.includes(k) ? "true" : "false");
+        c.onclick = () => { toggle(state.districts, k); haptic(); render(); };
+        chips.appendChild(c);
+      }
+      g.append(head, chips); box.appendChild(g);
+    }
+    $("districtsNote").textContent = state.districts.length ? "" : t.districtsNote;
+  } else {
+    $("districtsNote").textContent = t.districtsOther;
+  }
+
+  const presets = $("presets"); presets.innerHTML = "";
+  for (const p of [500, 800, 1200, 2000]) {
+    const c = document.createElement("button"); c.type = "button"; c.className = "chip";
+    c.textContent = `≤ $${p}`;
+    c.setAttribute("aria-pressed", state.max === p && !state.min ? "true" : "false");
+    c.onclick = () => { state.min = null; state.max = p; syncInputs(); haptic(); render(); };
+    presets.appendChild(c);
+  }
+  $("owner").checked = state.owner; $("pets").checked = state.pets; $("notify").checked = state.notify;
+
+  if (tg) { tg.MainButton.setText(t.save); tg.MainButton.show(); }
+  else $("fallbackSave").style.display = "block";
+}
+
+function syncInputs() { $("min").value = state.min ?? ""; $("max").value = state.max ?? ""; }
+for (const id of ["min", "max"]) {
+  $(id).addEventListener("input", e => {
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 6);
+    state[id] = e.target.value ? Number(e.target.value) : null;
+    $("summary").textContent = summaryText();
+    // перерисовываем только пресеты, чтобы не сбивать курсор в поле ввода
+    for (const c of $("presets").children)
+      c.setAttribute("aria-pressed", c.textContent === `≤ $${state.max}` && !state.min ? "true" : "false");
+  });
+}
+for (const id of ["owner", "pets", "notify"]) {
+  $(id).addEventListener("change", e => { state[id] = e.target.checked; haptic(); render(); });
+}
+
+function save() {
+  if (state.min && state.max && state.min > state.max) [state.min, state.max] = [state.max, state.min];
+  const data = JSON.stringify({ v: 1, ...state, districts: state.city === "tbilisi" ? state.districts : [] });
+  if (tg) tg.sendData(data);           // бот получит это сообщение, окно закроется само
+  else alert(data);                    // просмотр вне Telegram — показываем, что ушло бы боту
+}
+if (tg) tg.MainButton.onClick(save);
+$("fallbackSave").onclick = save;
+
+syncInputs();
+render();
+</script>
+</body>
+</html>
