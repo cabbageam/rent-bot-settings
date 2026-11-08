@@ -108,6 +108,10 @@
     <p id="summary"></p>
   </div>
 
+  <section id="subBox">
+    <div class="row"><div><span id="lSub"></span><small id="sSub"></small></div></div>
+  </section>
+
   <section>
     <h2 id="hCity"></h2>
     <div class="seg" id="city" role="group"></div>
@@ -190,7 +194,7 @@ const GROUPS = [
 
 // ---------- тексты страницы ----------
 const T = {
-  ru: { openFromMenu: "Чтобы сохранить, откройте настройки кнопкой «⚙️ Настройки» внизу чата с ботом.", title: "Настройки поиска", summaryLabel: "Вы ищете", city: "Город", districts: "Районы",
+  ru: { subPaid: d => `💎 Подписка до ${d}`, subTrial: d => `🎁 Пробная подписка до ${d}`, subPaidSub: "Квартиры без лимита, все мастера, цены по районам", subFree: "🆓 Бесплатная версия", subFreeSub: "10 квартир в день. Подписка — кнопка «💎 Подписка» в меню бота", openFromMenu: "Чтобы сохранить, откройте настройки кнопкой «⚙️ Настройки» внизу чата с ботом.", title: "Настройки поиска", summaryLabel: "Вы ищете", city: "Город", districts: "Районы",
     districtsNote: "Ничего не выбрано — ищем по всему городу.", districtsOther: "Для этого города ищем по всем районам.",
     all: "Выбрать все", none: "Снять все", budget: "Бюджет в месяц, $", from: "от", to: "до",
     rooms: "Комнаты", roomsNote: "Можно выбрать несколько. Ничего не выбрано — любое число.",
@@ -200,7 +204,7 @@ const T = {
     groups: { center: "Центр", west: "Ваке и Сабуртало", north: "Север", east: "Восток" },
     s: { any: "Любая квартира", rooms: n => `${n} комн.`, in: "в", anyDistrict: "весь город",
          upTo: "до", from: "от", owner: "только собственники", pets: "можно с животными", paused: "уведомления на паузе" } },
-  en: { openFromMenu: "To save, open settings with the “⚙️ Settings” button at the bottom of the bot chat.", title: "Search settings", summaryLabel: "You're looking for", city: "City", districts: "Districts",
+  en: { subPaid: d => `💎 Subscription until ${d}`, subTrial: d => `🎁 Free trial until ${d}`, subPaidSub: "Unlimited flats, all specialists, district prices", subFree: "🆓 Free version", subFreeSub: "10 flats a day. Subscribe with the 💎 Subscription button in the bot menu", openFromMenu: "To save, open settings with the “⚙️ Settings” button at the bottom of the bot chat.", title: "Search settings", summaryLabel: "You're looking for", city: "City", districts: "Districts",
     districtsNote: "Nothing selected — searching the whole city.", districtsOther: "For this city we search all districts.",
     all: "Select all", none: "Clear", budget: "Monthly budget, $", from: "from", to: "to",
     rooms: "Rooms", roomsNote: "Pick several if you like. None selected — any number.",
@@ -210,7 +214,7 @@ const T = {
     groups: { center: "Center", west: "Vake & Saburtalo", north: "North", east: "East" },
     s: { any: "Any apartment", rooms: n => `${n} rooms`, in: "in", anyDistrict: "the whole city",
          upTo: "up to", from: "from", owner: "owners only", pets: "pets allowed", paused: "alerts paused" } },
-  ka: { openFromMenu: "შესანახად გახსენით პარამეტრები ღილაკით „⚙️ პარამეტრები“ ბოტის ჩატის ქვედა ნაწილში.", title: "ძიების პარამეტრები", summaryLabel: "თქვენ ეძებთ", city: "ქალაქი", districts: "უბნები",
+  ka: { subPaid: d => `💎 გამოწერა ${d}-მდე`, subTrial: d => `🎁 საცდელი გამოწერა ${d}-მდე`, subPaidSub: "ულიმიტო ბინები, ყველა ხელოსანი, ფასები უბნებში", subFree: "🆓 უფასო ვერსია", subFreeSub: "დღეში 10 ბინა. გამოწერა — ღილაკი «💎 გამოწერა» ბოტის მენიუში", openFromMenu: "შესანახად გახსენით პარამეტრები ღილაკით „⚙️ პარამეტრები“ ბოტის ჩატის ქვედა ნაწილში.", title: "ძიების პარამეტრები", summaryLabel: "თქვენ ეძებთ", city: "ქალაქი", districts: "უბნები",
     districtsNote: "არაფერია არჩეული — ვეძებთ მთელ ქალაქში.", districtsOther: "ამ ქალაქში ვეძებთ ყველა უბანში.",
     all: "ყველა", none: "გასუფთავება", budget: "ბიუჯეტი თვეში, $", from: "დან", to: "მდე",
     rooms: "ოთახები", roomsNote: "შეიძლება რამდენიმე. არაფერია არჩეული — ნებისმიერი.",
@@ -220,7 +224,7 @@ const T = {
     groups: { center: "ცენტრი", west: "ვაკე და საბურთალო", north: "ჩრდილოეთი", east: "აღმოსავლეთი" },
     s: { any: "ნებისმიერი ბინა", rooms: n => `${n} ოთახი`, in: "—", anyDistrict: "მთელი ქალაქი",
          upTo: "მდე", from: "დან", owner: "მხოლოდ მესაკუთრეები", pets: "ცხოველით", paused: "შეტყობინებები პაუზაზეა" } },
-  hi: { openFromMenu: "सेव करने के लिए बॉट चैट के नीचे “⚙️ सेटिंग्स” बटन से सेटिंग्स खोलें।", title: "खोज सेटिंग्स", summaryLabel: "आप ढूँढ रहे हैं", city: "शहर", districts: "इलाके",
+  hi: { subPaid: d => `💎 सदस्यता ${d} तक`, subTrial: d => `🎁 मुफ़्त ट्रायल ${d} तक`, subPaidSub: "असीमित फ़्लैट, सभी विशेषज्ञ, इलाकों की कीमतें", subFree: "🆓 मुफ़्त संस्करण", subFreeSub: "दिन में 10 फ़्लैट. सदस्यता — बॉट मेनू में 💎 बटन", openFromMenu: "सेव करने के लिए बॉट चैट के नीचे “⚙️ सेटिंग्स” बटन से सेटिंग्स खोलें।", title: "खोज सेटिंग्स", summaryLabel: "आप ढूँढ रहे हैं", city: "शहर", districts: "इलाके",
     districtsNote: "कुछ नहीं चुना — पूरे शहर में खोज।", districtsOther: "इस शहर में सभी इलाकों में खोज।",
     all: "सब चुनें", none: "हटाएँ", budget: "मासिक बजट, $", from: "से", to: "तक",
     rooms: "कमरे", roomsNote: "एक से ज़्यादा चुन सकते हैं। कुछ नहीं चुना — कोई भी।",
@@ -230,7 +234,7 @@ const T = {
     groups: { center: "केंद्र", west: "वाके और साबुर्तालो", north: "उत्तर", east: "पूर्व" },
     s: { any: "कोई भी फ़्लैट", rooms: n => `${n} कमरे`, in: "—", anyDistrict: "पूरा शहर",
          upTo: "तक", from: "से", owner: "सिर्फ़ मालिक", pets: "पालतू की अनुमति", paused: "सूचनाएँ रुकी हैं" } },
-  fa: { openFromMenu: "برای ذخیره، تنظیمات را با دکمهٔ «⚙️ تنظیمات» پایین چت ربات باز کنید.", title: "تنظیمات جستجو", summaryLabel: "شما دنبال این هستید", city: "شهر", districts: "محله‌ها",
+  fa: { subPaid: d => `💎 اشتراک تا ${d}`, subTrial: d => `🎁 دورهٔ آزمایشی تا ${d}`, subPaidSub: "آپارتمان نامحدود، همهٔ متخصصان، قیمت محله‌ها", subFree: "🆓 نسخهٔ رایگان", subFreeSub: "روزی ۱۰ آپارتمان. اشتراک — دکمهٔ 💎 در منوی ربات", openFromMenu: "برای ذخیره، تنظیمات را با دکمهٔ «⚙️ تنظیمات» پایین چت ربات باز کنید.", title: "تنظیمات جستجو", summaryLabel: "شما دنبال این هستید", city: "شهر", districts: "محله‌ها",
     districtsNote: "چیزی انتخاب نشده — جستجو در کل شهر.", districtsOther: "در این شهر همهٔ محله‌ها جستجو می‌شود.",
     all: "انتخاب همه", none: "پاک کردن", budget: "بودجهٔ ماهانه، $", from: "از", to: "تا",
     rooms: "اتاق", roomsNote: "می‌توانید چند مورد انتخاب کنید. بدون انتخاب — فرقی نمی‌کند.",
@@ -255,6 +259,8 @@ const state = {
   owner: q.get("o") === "1", pets: q.get("p") === "1", notify: q.get("n") !== "0",
 };
 const multi = q.get("multi") === "1";
+const subUntil = num(q.get("sub")) || 0;            // до какого момента оплачено (секунды), 0 — бесплатно
+const subTrial = q.get("trial") === "1";
 
 // Внутри Telegram объект WebApp есть всегда; platform "unknown" — значит, страница открыта в обычном браузере.
 // Важно: при запуске кнопкой меню бота (единственный способ, где работает sendData) initData пустой.
@@ -316,6 +322,10 @@ function render() {
     ["lOwner", "owner"], ["sOwner", "ownerSub"], ["lPets", "pets"], ["lNotify", "notify"],
     ["sNotify", "notifySub"], ["hLang", "lang"], ["fallbackSave", "save"]]) $(id).textContent = t[key];
   $("multiNote").textContent = multi ? t.multi : "";
+  const paid = subUntil * 1000 > Date.now();
+  const until = new Date(subUntil * 1000).toLocaleDateString(state.lang, { day: "numeric", month: "long" });
+  $("lSub").textContent = paid ? (subTrial ? t.subTrial(until) : t.subPaid(until)) : t.subFree;
+  $("sSub").textContent = paid ? t.subPaidSub : t.subFreeSub;
   $("pageTitle").textContent = t.title;
   $("summary").textContent = summaryText();
 
