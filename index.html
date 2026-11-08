@@ -143,6 +143,8 @@
       <span class="switch"><input type="checkbox" id="owner"><i></i></span></div>
     <div class="row"><div><span id="lPets"></span></div>
       <span class="switch"><input type="checkbox" id="pets"><i></i></span></div>
+    <div class="row"><div><span id="lPhotos"></span></div>
+      <span class="switch"><input type="checkbox" id="photos"><i></i></span></div>
     <div class="row"><div><span id="lNotify"></span><small id="sNotify"></small></div>
       <span class="switch"><input type="checkbox" id="notify"><i></i></span></div>
   </section>
@@ -194,7 +196,7 @@ const GROUPS = [
 
 // ---------- тексты страницы ----------
 const T = {
-  ru: { subPaid: d => `💎 Подписка до ${d}`, subTrial: d => `🎁 Пробная подписка до ${d}`, subPaidSub: "Квартиры без лимита, все мастера, цены по районам", subFree: "🆓 Бесплатная версия", subFreeSub: "10 квартир в день. Подписка — кнопка «💎 Подписка» в меню бота", openFromMenu: "Чтобы сохранить, откройте настройки кнопкой «⚙️ Настройки» внизу чата с ботом.", title: "Настройки поиска", summaryLabel: "Вы ищете", city: "Город", districts: "Районы",
+  ru: { photosL: '📷 Только с фото', subPaid: d => `💎 Подписка до ${d}`, subTrial: d => `🎁 Пробная подписка до ${d}`, subPaidSub: "Квартиры без лимита, все мастера, цены по районам", subFree: "🆓 Бесплатная версия", subFreeSub: "10 квартир в день. Подписка — кнопка «💎 Подписка» в меню бота", openFromMenu: "Чтобы сохранить, откройте настройки кнопкой «⚙️ Настройки» внизу чата с ботом.", title: "Настройки поиска", summaryLabel: "Вы ищете", city: "Город", districts: "Районы",
     districtsNote: "Ничего не выбрано — ищем по всему городу.", districtsOther: "Для этого города ищем по всем районам.",
     all: "Выбрать все", none: "Снять все", budget: "Бюджет в месяц, $", from: "от", to: "до",
     rooms: "Комнаты", roomsNote: "Можно выбрать несколько. Ничего не выбрано — любое число.",
@@ -203,8 +205,8 @@ const T = {
     lang: "Язык бота", save: "Сохранить", multi: "Здесь меняется ваш основной фильтр. Остальные фильтры — в чате, кнопка «Мои фильтры».",
     groups: { center: "Центр", west: "Ваке и Сабуртало", north: "Север", east: "Восток" },
     s: { any: "Любая квартира", rooms: n => `${n} комн.`, in: "в", anyDistrict: "весь город",
-         upTo: "до", from: "от", owner: "только собственники", pets: "можно с животными", paused: "уведомления на паузе" } },
-  en: { subPaid: d => `💎 Subscription until ${d}`, subTrial: d => `🎁 Free trial until ${d}`, subPaidSub: "Unlimited flats, all specialists, district prices", subFree: "🆓 Free version", subFreeSub: "10 flats a day. Subscribe with the 💎 Subscription button in the bot menu", openFromMenu: "To save, open settings with the “⚙️ Settings” button at the bottom of the bot chat.", title: "Search settings", summaryLabel: "You're looking for", city: "City", districts: "Districts",
+         upTo: "до", from: "от", owner: "только собственники", photos: 'только с фото', pets: "можно с животными", paused: "уведомления на паузе" } },
+  en: { photosL: '📷 With photos only', subPaid: d => `💎 Subscription until ${d}`, subTrial: d => `🎁 Free trial until ${d}`, subPaidSub: "Unlimited flats, all specialists, district prices", subFree: "🆓 Free version", subFreeSub: "10 flats a day. Subscribe with the 💎 Subscription button in the bot menu", openFromMenu: "To save, open settings with the “⚙️ Settings” button at the bottom of the bot chat.", title: "Search settings", summaryLabel: "You're looking for", city: "City", districts: "Districts",
     districtsNote: "Nothing selected — searching the whole city.", districtsOther: "For this city we search all districts.",
     all: "Select all", none: "Clear", budget: "Monthly budget, $", from: "from", to: "to",
     rooms: "Rooms", roomsNote: "Pick several if you like. None selected — any number.",
@@ -213,8 +215,8 @@ const T = {
     lang: "Bot language", save: "Save", multi: "This edits your main filter. Other filters are in the chat, “My filters” button.",
     groups: { center: "Center", west: "Vake & Saburtalo", north: "North", east: "East" },
     s: { any: "Any apartment", rooms: n => `${n} rooms`, in: "in", anyDistrict: "the whole city",
-         upTo: "up to", from: "from", owner: "owners only", pets: "pets allowed", paused: "alerts paused" } },
-  ka: { subPaid: d => `💎 გამოწერა ${d}-მდე`, subTrial: d => `🎁 საცდელი გამოწერა ${d}-მდე`, subPaidSub: "ულიმიტო ბინები, ყველა ხელოსანი, ფასები უბნებში", subFree: "🆓 უფასო ვერსია", subFreeSub: "დღეში 10 ბინა. გამოწერა — ღილაკი «💎 გამოწერა» ბოტის მენიუში", openFromMenu: "შესანახად გახსენით პარამეტრები ღილაკით „⚙️ პარამეტრები“ ბოტის ჩატის ქვედა ნაწილში.", title: "ძიების პარამეტრები", summaryLabel: "თქვენ ეძებთ", city: "ქალაქი", districts: "უბნები",
+         upTo: "up to", from: "from", owner: "owners only", photos: 'with photos only', pets: "pets allowed", paused: "alerts paused" } },
+  ka: { photosL: '📷 მხოლოდ ფოტოთი', subPaid: d => `💎 გამოწერა ${d}-მდე`, subTrial: d => `🎁 საცდელი გამოწერა ${d}-მდე`, subPaidSub: "ულიმიტო ბინები, ყველა ხელოსანი, ფასები უბნებში", subFree: "🆓 უფასო ვერსია", subFreeSub: "დღეში 10 ბინა. გამოწერა — ღილაკი «💎 გამოწერა» ბოტის მენიუში", openFromMenu: "შესანახად გახსენით პარამეტრები ღილაკით „⚙️ პარამეტრები“ ბოტის ჩატის ქვედა ნაწილში.", title: "ძიების პარამეტრები", summaryLabel: "თქვენ ეძებთ", city: "ქალაქი", districts: "უბნები",
     districtsNote: "არაფერია არჩეული — ვეძებთ მთელ ქალაქში.", districtsOther: "ამ ქალაქში ვეძებთ ყველა უბანში.",
     all: "ყველა", none: "გასუფთავება", budget: "ბიუჯეტი თვეში, $", from: "დან", to: "მდე",
     rooms: "ოთახები", roomsNote: "შეიძლება რამდენიმე. არაფერია არჩეული — ნებისმიერი.",
@@ -223,8 +225,8 @@ const T = {
     lang: "ბოტის ენა", save: "შენახვა", multi: "აქ იცვლება მთავარი ფილტრი. სხვა ფილტრები — ჩატში, ღილაკი „ჩემი ფილტრები“.",
     groups: { center: "ცენტრი", west: "ვაკე და საბურთალო", north: "ჩრდილოეთი", east: "აღმოსავლეთი" },
     s: { any: "ნებისმიერი ბინა", rooms: n => `${n} ოთახი`, in: "—", anyDistrict: "მთელი ქალაქი",
-         upTo: "მდე", from: "დან", owner: "მხოლოდ მესაკუთრეები", pets: "ცხოველით", paused: "შეტყობინებები პაუზაზეა" } },
-  hi: { subPaid: d => `💎 सदस्यता ${d} तक`, subTrial: d => `🎁 मुफ़्त ट्रायल ${d} तक`, subPaidSub: "असीमित फ़्लैट, सभी विशेषज्ञ, इलाकों की कीमतें", subFree: "🆓 मुफ़्त संस्करण", subFreeSub: "दिन में 10 फ़्लैट. सदस्यता — बॉट मेनू में 💎 बटन", openFromMenu: "सेव करने के लिए बॉट चैट के नीचे “⚙️ सेटिंग्स” बटन से सेटिंग्स खोलें।", title: "खोज सेटिंग्स", summaryLabel: "आप ढूँढ रहे हैं", city: "शहर", districts: "इलाके",
+         upTo: "მდე", from: "დან", owner: "მხოლოდ მესაკუთრეები", photos: 'მხოლოდ ფოტოთი', pets: "ცხოველით", paused: "შეტყობინებები პაუზაზეა" } },
+  hi: { photosL: '📷 सिर्फ़ फ़ोटो वाले', subPaid: d => `💎 सदस्यता ${d} तक`, subTrial: d => `🎁 मुफ़्त ट्रायल ${d} तक`, subPaidSub: "असीमित फ़्लैट, सभी विशेषज्ञ, इलाकों की कीमतें", subFree: "🆓 मुफ़्त संस्करण", subFreeSub: "दिन में 10 फ़्लैट. सदस्यता — बॉट मेनू में 💎 बटन", openFromMenu: "सेव करने के लिए बॉट चैट के नीचे “⚙️ सेटिंग्स” बटन से सेटिंग्स खोलें।", title: "खोज सेटिंग्स", summaryLabel: "आप ढूँढ रहे हैं", city: "शहर", districts: "इलाके",
     districtsNote: "कुछ नहीं चुना — पूरे शहर में खोज।", districtsOther: "इस शहर में सभी इलाकों में खोज।",
     all: "सब चुनें", none: "हटाएँ", budget: "मासिक बजट, $", from: "से", to: "तक",
     rooms: "कमरे", roomsNote: "एक से ज़्यादा चुन सकते हैं। कुछ नहीं चुना — कोई भी।",
@@ -233,8 +235,8 @@ const T = {
     lang: "बॉट की भाषा", save: "सेव करें", multi: "यहाँ आपका मुख्य फ़िल्टर बदलता है। बाकी फ़िल्टर चैट में, “मेरे फ़िल्टर” बटन।",
     groups: { center: "केंद्र", west: "वाके और साबुर्तालो", north: "उत्तर", east: "पूर्व" },
     s: { any: "कोई भी फ़्लैट", rooms: n => `${n} कमरे`, in: "—", anyDistrict: "पूरा शहर",
-         upTo: "तक", from: "से", owner: "सिर्फ़ मालिक", pets: "पालतू की अनुमति", paused: "सूचनाएँ रुकी हैं" } },
-  fa: { subPaid: d => `💎 اشتراک تا ${d}`, subTrial: d => `🎁 دورهٔ آزمایشی تا ${d}`, subPaidSub: "آپارتمان نامحدود، همهٔ متخصصان، قیمت محله‌ها", subFree: "🆓 نسخهٔ رایگان", subFreeSub: "روزی ۱۰ آپارتمان. اشتراک — دکمهٔ 💎 در منوی ربات", openFromMenu: "برای ذخیره، تنظیمات را با دکمهٔ «⚙️ تنظیمات» پایین چت ربات باز کنید.", title: "تنظیمات جستجو", summaryLabel: "شما دنبال این هستید", city: "شهر", districts: "محله‌ها",
+         upTo: "तक", from: "से", owner: "सिर्फ़ मालिक", photos: 'सिर्फ़ फ़ोटो वाले', pets: "पालतू की अनुमति", paused: "सूचनाएँ रुकी हैं" } },
+  fa: { photosL: '📷 فقط با عکس', subPaid: d => `💎 اشتراک تا ${d}`, subTrial: d => `🎁 دورهٔ آزمایشی تا ${d}`, subPaidSub: "آپارتمان نامحدود، همهٔ متخصصان، قیمت محله‌ها", subFree: "🆓 نسخهٔ رایگان", subFreeSub: "روزی ۱۰ آپارتمان. اشتراک — دکمهٔ 💎 در منوی ربات", openFromMenu: "برای ذخیره، تنظیمات را با دکمهٔ «⚙️ تنظیمات» پایین چت ربات باز کنید.", title: "تنظیمات جستجو", summaryLabel: "شما دنبال این هستید", city: "شهر", districts: "محله‌ها",
     districtsNote: "چیزی انتخاب نشده — جستجو در کل شهر.", districtsOther: "در این شهر همهٔ محله‌ها جستجو می‌شود.",
     all: "انتخاب همه", none: "پاک کردن", budget: "بودجهٔ ماهانه، $", from: "از", to: "تا",
     rooms: "اتاق", roomsNote: "می‌توانید چند مورد انتخاب کنید. بدون انتخاب — فرقی نمی‌کند.",
@@ -243,7 +245,7 @@ const T = {
     lang: "زبان ربات", save: "ذخیره", multi: "اینجا فیلتر اصلی شما تغییر می‌کند. بقیهٔ فیلترها در چت، دکمهٔ «فیلترهای من».",
     groups: { center: "مرکز", west: "واکه و سابورتالو", north: "شمال", east: "شرق" },
     s: { any: "هر آپارتمانی", rooms: n => `${n} اتاق`, in: "—", anyDistrict: "کل شهر",
-         upTo: "تا", from: "از", owner: "فقط مالکان", pets: "حیوان مجاز", paused: "اعلان‌ها متوقف است" } },
+         upTo: "تا", from: "از", owner: "فقط مالکان", photos: 'فقط با عکس', pets: "حیوان مجاز", paused: "اعلان‌ها متوقف است" } },
 };
 
 // ---------- состояние: приходит от бота в адресе страницы ----------
@@ -256,7 +258,7 @@ const state = {
   districts: list(q.get("d")).filter(k => D[k]),
   min: num(q.get("min")), max: num(q.get("max")),
   rooms: list(q.get("r")).map(Number).filter(n => n >= 1 && n <= 4),
-  owner: q.get("o") === "1", pets: q.get("p") === "1", notify: q.get("n") !== "0",
+  owner: q.get("o") === "1", pets: q.get("p") === "1", photos: q.get("ph") === "1", notify: q.get("n") !== "0",
 };
 const multi = q.get("multi") === "1";
 const subUntil = num(q.get("sub")) || 0;            // до какого момента оплачено (секунды), 0 — бесплатно
@@ -308,6 +310,7 @@ function summaryText() {
   else if (state.min) parts.push(state.lang === "ka" || state.lang === "hi" ? `$${state.min} ${s.from}` : `${s.from} $${state.min}`);
   if (state.owner) parts.push(s.owner);
   if (state.pets) parts.push(s.pets);
+  if (state.photos) parts.push(s.photos);
   if (!state.notify) parts.push("⏸ " + s.paused);
   return parts.join(" · ");
 }
@@ -319,7 +322,7 @@ function render() {
   document.title = t.title;
   for (const [id, key] of [["summaryLabel", "summaryLabel"], ["hCity", "city"], ["hDistricts", "districts"],
     ["hBudget", "budget"], ["lFrom", "from"], ["lTo", "to"], ["hRooms", "rooms"], ["roomsNote", "roomsNote"],
-    ["lOwner", "owner"], ["sOwner", "ownerSub"], ["lPets", "pets"], ["lNotify", "notify"],
+    ["lOwner", "owner"], ["sOwner", "ownerSub"], ["lPets", "pets"], ["lPhotos", "photosL"], ["lNotify", "notify"],
     ["sNotify", "notifySub"], ["hLang", "lang"], ["fallbackSave", "save"]]) $(id).textContent = t[key];
   $("multiNote").textContent = multi ? t.multi : "";
   const paid = subUntil * 1000 > Date.now();
@@ -374,7 +377,7 @@ function render() {
     c.onclick = () => { state.min = null; state.max = p; syncInputs(); haptic(); render(); };
     presets.appendChild(c);
   }
-  $("owner").checked = state.owner; $("pets").checked = state.pets; $("notify").checked = state.notify;
+  $("owner").checked = state.owner; $("pets").checked = state.pets; $("photos").checked = state.photos; $("notify").checked = state.notify;
 
   if (tg) {
     tg.MainButton.setParams({ text: t.save, color: darkTheme ? "#f4675a" : "#3a0a14",
@@ -394,7 +397,7 @@ for (const id of ["min", "max"]) {
       c.setAttribute("aria-pressed", c.textContent === `≤ $${state.max}` && !state.min ? "true" : "false");
   });
 }
-for (const id of ["owner", "pets", "notify"]) {
+for (const id of ["owner", "pets", "photos", "notify"]) {
   $(id).addEventListener("change", e => { state[id] = e.target.checked; haptic(); render(); });
 }
 
